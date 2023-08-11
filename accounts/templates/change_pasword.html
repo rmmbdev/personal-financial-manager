@@ -1,0 +1,126 @@
+{% extends 'admin.html' %}
+{% load static %}
+
+{% block head %}
+    <link rel="stylesheet" href="{% static 'vendor/bootstrap-tokenfield/bootstrap-tokenfield.min.css' %}">
+    <link rel="stylesheet" href="{% static 'vendor/bootstrap-datepicker/bootstrap-datepicker.min.css' %}">
+    <link rel="stylesheet" href="{% static 'persian-datepicker/jquery.md.bootstrap.datetimepicker.style.css' %}">
+    <link rel="stylesheet" href="{% static 'file-explorer/style.css' %}">
+    <style>
+        .rtl-element {
+            direction: rtl !important;
+        }
+
+        .font-tahoma {
+            font-family: 'Tahoma' !important;
+        }
+
+        .font-nazanin {
+            font-family: 'B Nazanin' !important;
+        }
+
+        textarea {
+            resize: none;
+        }
+
+        .form-group-margin-top {
+            margin-top: 30px;
+        }
+    </style>
+    <script src="{% static 'editor/ckeditor.js' %}"></script>
+
+{% endblock %}
+
+{% block content %}
+    <div class="page animsition">
+        <div class="page-header">
+            <h1 class="page-title">Material Elements</h1>
+            <ol class="breadcrumb">
+                <li><a href="{% url 'manger_index' %}">Home</a></li>
+                <li class="active">Change Password</li>
+            </ol>
+            <div class="page-header-actions">
+                <button type="button" class="btn btn-sm btn-icon btn-default btn-outline btn-round"
+                        data-toggle="tooltip" data-original-title="Refresh" onclick="location.reload();">
+                    <i class="icon wb-refresh" aria-hidden="true"></i>
+                </button>
+                <button type="button" class="btn btn-sm btn-icon btn-default btn-outline btn-round"
+                        data-toggle="tooltip" data-original-title="Back" onclick="window.history.back();">
+                    <i class="icon wb-arrow-left" aria-hidden="true"></i>
+                </button>
+            </div>
+        </div>
+        <div class="page-content container-fluid">
+            <div class="row">
+                <div class="col-sm-8 col-sm-offset-2">
+                    <!-- Panel Floating Lables -->
+                    <div class="panel">
+                        <div class="panel-heading">
+                            <h3 class="panel-title rtl-element font-nazanin" style="font-size: 17pt; font-weight: bold">
+                                تغییر کلمه عبور
+                            </h3>
+                        </div>
+                        <div class="panel-body container-fluid">
+                            <form method="post" action="{% url 'change_password' %}">
+                                {% csrf_token %}
+                                <div class="rtl-element">
+                                    <h4 class="font-tahoma">کلمه عبور جدید</h4>
+                                    <input type="password" class="form-control font-tahoma" id="inputHelpText"
+                                           name="password">
+                                    <span class="help-block font-tahoma ">
+                                        کلمه عبور باید ...
+                                    </span>
+                                </div>
+                                <div class="rtl-element form-group-margin-top">
+                                    <h4 class="font-tahoma">تکرار کلمه عبور جدید</h4>
+                                    <input type="password" class="form-control font-tahoma" id="inputHelpText"
+                                           name="confirm_password">
+                                </div>
+                                <div class="rtl-element form-group-margin-top">
+                                    <button type="submit" class="btn btn-primary font-tahoma">
+                                        <i class="icon wb-check" aria-hidden="true"></i> ذخیره
+                                    </button>
+                                    <button type="button" class="btn btn-danger font-tahoma"
+                                            onclick="window.history.back();return false;">
+                                        <i class="icon wb-refresh" aria-hidden="true"></i> بازگشت
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                    <!-- End Panel Floating Lables -->
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block tail %}
+    <script src="{% static 'js/components/material.js' %}"></script>
+    <script src="{% static 'vendor/bootstrap-tokenfield/bootstrap-tokenfield.min.js' %}"></script>
+    <script src="{% static 'js/components/bootstrap-tokenfield.min.js' %}"></script>
+    <script src="{% static 'vendor/bootstrap-datepicker/bootstrap-datepicker.min.js' %}"></script>
+    <script src="{% static 'js/components/bootstrap-datepicker.min.js' %}"></script>
+    <script src="{% static 'persian-datepicker/jquery.md.bootstrap.datetimepicker.js' %}"></script>
+    <script src="{% static 'file-explorer/script.js' %}"></script>
+    <script>
+        $(document).ready(function () {
+            $('#tokenfield').tokenfield();
+            /*
+            $('#publish-date').datepicker({
+                orientation: "auto right"
+            });
+             */
+            $('#publish-date').MdPersianDateTimePicker({
+                targetTextSelector: '#publish-date',
+                targetDateSelector: '#inputHiddenDate1',
+                orientation: "auto right",
+                dateFormat: "yyyy-MM-dd"
+            });
+
+            CKEDITOR.replace('editor1', {
+                height: '1000px'
+            });
+        })
+    </script>
+{% endblock %}

@@ -1,0 +1,655 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load humanize %}
+
+
+{% block head %}
+    <link rel="stylesheet" href="{% static "vendors/fontawesome/all.min.css" %}">
+    <style>
+        .fontawesome-icons {
+            text-align: center;
+        }
+
+        article dl {
+            background-color: rgba(0, 0, 0, .02);
+            padding: 20px;
+        }
+
+        .fontawesome-icons .the-icon svg {
+            font-size: 24px;
+        }
+    </style>
+
+    <link rel="stylesheet" href="{% static "vendors/fontawesome/css/font-awesome.css" %}">
+    <link rel="stylesheet" href="{% static "vendors/simple-datatables/style.css" %}">
+
+    <!-- Include Choices CSS -->
+    <link rel="stylesheet" href="{% static "vendors/choices.js/choices.min.css" %}"/>
+    <style>
+        .choices {
+            width: 100% !important;
+        }
+    </style>
+{% endblock %}
+
+{% block page_heading %}
+    <h3>Profile Statistics</h3>
+{% endblock %}
+
+{% block content %}
+    <input type="hidden" value="{{ tags }}">
+    <input type="hidden" id="last_ten_users_transactions" value="{{ last_ten_users_transactions }}">
+    <section class="row">
+        <div class="col-12 col-lg-12">
+            <div class="card">
+                <div class="card-header">
+                    <h4>Latest Transactions
+                        <span style="float: right;">
+                            <button type="button"
+                                    style="height: 28px;"
+                                    class="btn btn-sm btn-outline-primary"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#add-transaction">
+                                <i class="fa fa-plus"></i>
+                            </button>
+                        </span>
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <div class="accordion" id="accordionExample">
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="headingOne">
+                                <button class="btn btn-sm accordion-button" type="button"
+                                        data-bs-toggle="collapse"
+                                        data-bs-target="#collapseOne" aria-expanded="true"
+                                        aria-controls="collapseOne">
+                                    <i class="fa fa-chevron-right"></i>
+                                </button>
+                            </h2>
+                            <div id="collapseOne" class="accordion-collapse collapse show"
+                                 aria-labelledby="headingOne"
+                                 data-bs-parent="#accordionExample">
+                                <div class="accordion-body">
+                                    <table class="table table-striped" id="table1">
+                                        <thead>
+                                        <tr>
+                                            <th>#</th>
+                                            <th>Title</th>
+                                            <th>Value</th>
+                                            <th>Discount</th>
+                                            <th>Date</th>
+                                            <th>Tags</th>
+                                            <th>Username</th>
+                                            <th>Description</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        {% for transaction in transactions %}
+                                            <tr>
+                                                <td>
+                                                    <a style="height: 28px;"
+                                                       href="{% url 'edit_transaction' %}?id={{ transaction.id }}"
+                                                       class="btn btn-sm btn-outline-secondary">
+                                                        <i class="fa fa-pen"></i>
+                                                    </a>
+                                                    <a style="height: 28px;"
+                                                       href="{% url 'remove_transaction' %}?id={{ transaction.id }}"
+                                                       class="btn btn-sm btn-outline-danger">
+                                                        <i class="fa fa-trash"></i>
+                                                    </a>
+                                                </td>
+                                                <td>{{ transaction.title }}</td>
+                                                <td>{{ transaction.value_raw }}</td>
+                                                <td>{{ transaction.discount }}</td>
+                                                <td>{{ transaction.date |date:'Y-m-d H:i' }}</td>
+                                                <td>
+                                                    {% for t in  transaction.tags.all %}
+                                                        <span class="badge bg-success">{{ t }}</span>
+                                                    {% endfor %}
+                                                </td>
+                                                <td>{{ transaction.user.username }}</td>
+                                                <td>{{ transaction.description }}</td>
+                                            </tr>
+                                        {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <section class="row">
+        <div class="col-12 col-lg-12">
+            <div class="row">
+                <div class="col-6 col-lg-3 col-md-6">
+                    <div class="card">
+                        <div class="card-body px-3 py-4-5">
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="stats-icon red">
+                                        <i class="iconly-boldBuy"></i>
+                                    </div>
+                                </div>
+                                <div class="col-md-8">
+                                    <h6 class="text-muted font-semibold">
+                                        Month
+                                    </h6>
+                                    <h6 class="font-extrabold mb-0">{{ this_month_value|intcomma }} <span>T</span></h6>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-6 col-lg-3 col-md-6">
+                    <div class="card">
+                        <div class="card-body px-3 py-4-5">
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="stats-icon blue">
+                                        <i class="iconly-boldCalendar"></i>
+                                    </div>
+                                </div>
+                                <div class="col-md-8">
+                                    <h6 class="text-muted font-semibold">Today</h6>
+                                    <h6 class="font-extrabold mb-0">{{ today_value |intcomma }} <span>T</span></h6>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-6 col-lg-3 col-md-6">
+                    <div class="card">
+                        <div class="card-body px-3 py-4-5">
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="stats-icon purple">
+                                        <i class="iconly-boldCalendar"></i>
+                                    </div>
+                                </div>
+                                <div class="col-md-8">
+                                    <h6 class="text-muted font-semibold">Last Week</h6>
+                                    <h6 class="font-extrabold mb-0">{{ last_week_value|intcomma }} <span>T</span></h6>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-6 col-lg-3 col-md-6">
+                    <div class="card">
+                        <div class="card-body px-3 py-4-5">
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="stats-icon green">
+                                        <i class="iconly-boldDiscount"></i>
+                                    </div>
+                                </div>
+                                <div class="col-md-8">
+                                    <h6 class="text-muted font-semibold">Month Discounts</h6>
+                                    <h6 class="font-extrabold mb-0">{{ this_month_discounts|intcomma }} <span>T</span>
+                                    </h6>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <h4>Last Week</h4>
+                        </div>
+                        <div class="card-body">
+                            <div id="chart-profile-visit"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-12 col-xl-6">
+                    <div class="card">
+                        <div class="card-header">
+                            <h4>Last 10 Transactions Per User</h4>
+                        </div>
+                        <div class="card-body">
+                            {% for ut in last_ten_users_transactions %}
+                                <div class="row ut">
+                                    <input type="hidden" id="dates" value="{{ ut.dates|safe }}">
+                                    <input type="hidden" id="values" value="{{ ut.values|safe }}">
+                                    <div class="col-6">
+                                        <div class="d-flex align-items-center">
+                                            <svg class="bi text-primary" width="32" height="32" fill="blue"
+                                                 style="width: 10px">
+                                                <use xlink:href="{% static "vendors/bootstrap-icons/bootstrap-icons.svg#circle-fill" %}"/>
+                                            </svg>
+                                            <h5 class="mb-0 ms-3">
+                                                <div class="d-flex align-items-center">
+                                                    <div class="avatar avatar-md">
+                                                        <img src="{% static ut.avatar %}" alt="" srcset="">
+                                                    </div>
+                                                    {% if ut.username == request.user.username %}
+                                                        <p class="font-bold ms-3 mb-0">Yourself</p>
+                                                    {% else %}
+                                                        <p class="font-bold ms-3 mb-0">{{ ut.username }}</p>
+                                                    {% endif %}
+                                                </div>
+                                            </h5>
+                                        </div>
+                                    </div>
+                                    <div class="col-6">
+                                        <h5 class="mb-0">{{ ut.total }} T</h5>
+                                    </div>
+                                    <div class="col-12">
+                                        <div id="chart-{{ forloop.counter0 }}"></div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+
+                        </div>
+                    </div>
+                </div>
+                <div class="coll-12 col-xl-6">
+                    <div class="card">
+                        <div class="card-header">
+                            <h4>Last Month by Tags
+                                <span style="float: right;">
+                                    <button type="button"
+                                            style="height: 28px;"
+                                            class="btn btn-sm btn-outline-success"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#add-tag">
+                                        <i class="fa fa-plus"></i>
+                                    </button>
+                                </span>
+                            </h4>
+                        </div>
+                        <div class="card-body">
+                            <div id="chart-visitors-profile"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="coll-12 col-xl-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <h4>Last Month by Tags</h4>
+                        </div>
+                        <div class="card-body">
+                            <table class="table table-striped" id="table2">
+                                <thead>
+                                <tr>
+                                    <th>Title</th>
+                                    <th>Value</th>
+                                    <th>Discount</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {% for at in account_tags_table %}
+                                    <tr>
+                                        <td>{{ at.tag }}</td>
+                                        <td>{{ at.value }}</td>
+                                        <td>{{ at.discount }}</td>
+                                    </tr>
+                                {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        <!--Add New Tag Modal -->
+        <div class="modal fade text-left" id="add-tag" tabindex="-1"
+             role="dialog"
+             aria-labelledby="myModalLabel110" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable"
+                 role="document">
+                <div class="modal-content">
+                    <div class="modal-header bg-success">
+                        <h5 class="modal-title white" id="myModalLabel110">
+                            Add New Tag
+                        </h5>
+                        <button type="button" class="close"
+                                data-bs-dismiss="modal"
+                                aria-label="Close">
+                            <i data-feather="x"></i>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <form class="form form-horizontal" id="add-tag-form" action="{% url 'add_tag' %}" method="post">
+                            {% csrf_token %}
+                            <input type="hidden" name="account_id" value="{{ selected_account_id }}">
+                            <input type="hidden" name="next" value="{% url 'homepage' %}">
+                            <div class="form-body">
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <label>Title</label>
+                                    </div>
+                                    <div class="col-md-8">
+                                        <div class="form-group has-icon-left">
+                                            <div class="position-relative">
+                                                <input type="text" class="form-control" placeholder="Title"
+                                                       id="first-name-icon" name="title">
+                                                <div class="form-control-icon">
+                                                    <i class="bi bi-tag"></i>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-light-secondary"
+                                data-bs-dismiss="modal">
+                            Close
+                        </button>
+                        <button type="button" class="btn btn-success ml-1"
+                                data-bs-dismiss="modal" onclick="$('#add-tag-form').submit()">
+                            Add
+                        </button>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!--Add New Transaction Modal -->
+        <div class="modal fade text-left" id="add-transaction" tabindex="-1"
+             role="dialog"
+             aria-labelledby="myModalLabel110" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable"
+                 role="document">
+                <div class="modal-content">
+                    <div class="modal-header bg-primary">
+                        <h5 class="modal-title white" id="myModalLabel110">
+                            Add New Transaction
+                        </h5>
+                        <button type="button" class="close"
+                                data-bs-dismiss="modal"
+                                aria-label="Close">
+                            <i data-feather="x"></i>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <form class="form form-horizontal" id="add-transaction-form"
+                              action="{% url 'add_transaction' %}" method="post">
+                            {% csrf_token %}
+                            <input type="hidden" name="account_id" value="{{ selected_account_id }}">
+                            <div class="form-body">
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <label>Title</label>
+                                    </div>
+                                    <div class="col-md-8">
+                                        <div class="form-group has-icon-left">
+                                            <div class="position-relative">
+                                                <input type="text" class="form-control" placeholder="Title"
+                                                       id="title" name="title">
+                                                <div class="form-control-icon">
+                                                    <i class="bi bi-pen"></i>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <label>Value</label>
+                                    </div>
+                                    <div class="col-md-8">
+                                        <div class="form-group has-icon-left">
+                                            <div class="position-relative">
+                                                <input type="text" class="form-control" placeholder="Value"
+                                                       id="value" name="value">
+                                                <div class="form-control-icon">
+                                                    <i class="bi bi-cash-stack"></i>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <label>Discount</label>
+                                    </div>
+                                    <div class="col-md-8">
+                                        <div class="form-group has-icon-left">
+                                            <div class="position-relative">
+                                                <input type="text" class="form-control"
+                                                       placeholder="Discount Value"
+                                                       id="discount" name="discount" value="0">
+                                                <div class="form-control-icon">
+                                                    <i class="bi bi-cash"></i>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <label>Related Tags</label>
+                                    </div>
+                                    <div class="col-md-8">
+                                        <div class="input-group mb-3">
+                                            <select class="choices form-select" multiple="multiple"
+                                                    id="inputGroupSelect01" name="tags">
+                                                {% for tag in tags %}
+                                                    <option value="{{ tag.id }}">{{ tag.title }}</option>
+                                                {% endfor %}
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <label>Date</label>
+                                    </div>
+                                    <div class="col-md-8">
+                                        <div class="form-group has-icon-left">
+                                            <div class="position-relative">
+                                                <input type="text" class="form-control" placeholder="Date"
+                                                       id="first-name-icon" name="date"
+                                                       value="{{ current_date|date:'Y-m-d H:i' }}">
+                                                <div class="form-control-icon">
+                                                    <i class="bi bi-calendar"></i>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <label>Description</label>
+                                    </div>
+                                    <div class="col-md-8">
+                                        <div class="form-group">
+                                            <div class="position-relative">
+                                                <textarea type="text" class="form-control" placeholder="Description"
+                                                          id="first-name-icon" name="description"
+                                                          rows="4"></textarea>
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-light-secondary"
+                                data-bs-dismiss="modal">
+                            Close
+                        </button>
+                        <button type="button" class="btn btn-primary ml-1"
+                                data-bs-dismiss="modal" onclick="$('#add-transaction-form').submit()">
+                            Add
+                        </button>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </section>
+
+
+{% endblock %}
+
+{% block tail %}
+
+
+    <script>
+        var weekPerDayValueOptions = {
+            annotations: {
+                position: 'back'
+            },
+            dataLabels: {
+                enabled: false
+            },
+            chart: {
+                type: 'bar',
+                height: 300
+            },
+            fill: {
+                opacity: 1
+            },
+            plotOptions: {},
+            series: [{
+                name: 'paid',
+                {#data: [100, 10, 50, 50, 40, 50, 10]#}
+                data: {{ last_week_report_values }}
+            }],
+            colors: '#435ebe',
+            xaxis: {
+                categories: {{ last_week_report_days|safe }},
+                {#categories: ["Sat", "Sun", "Mon", "Tue", "Wed", "Thu", "Fri"],#}
+            },
+        };
+
+        var weekPerDayValue = new ApexCharts(document.querySelector("#chart-profile-visit"), weekPerDayValueOptions);
+        weekPerDayValue.render();
+    </script>
+
+    <script>
+        $(document).ready(function () {
+            $(".row.ut").each(function (index) {
+                let dates = $(this).find("#dates").val();
+                dates = JSON.parse(dates.replace(/'/g, '"'));
+                let values = $(this).find("#values").val();
+                values = JSON.parse(values.replace(/'/g, '"'));
+
+                var options = {
+                    series: [{
+                        name: 'series1',
+                        data: values
+                    }],
+                    chart: {
+                        height: 80,
+                        type: 'area',
+                        toolbar: {
+                            show: false,
+                        },
+                    },
+                    colors: ['#5350e9'],
+                    stroke: {
+                        width: 2,
+                    },
+                    grid: {
+                        show: false,
+                    },
+                    dataLabels: {
+                        enabled: false
+                    },
+                    xaxis: {
+                        type: 'datetime',
+                        {#categories: ["2018-09-19T00:00:00.000Z", "2018-09-20T00:00:00.000Z", "2018-09-21T00:00:00.000Z", "2018-09-22T00:00:00.000Z", "2018-09-23T00:00:00.000Z", "2018-09-24T00:00:00.000Z", "2018-09-25T00:00:00.000Z"],#}
+                        categories: dates,
+                        axisBorder: {
+                            show: false
+                        },
+                        axisTicks: {
+                            show: false
+                        },
+                        labels: {
+                            show: false,
+                        }
+                    },
+                    show: false,
+                    yaxis: {
+                        labels: {
+                            show: false,
+                        },
+                    },
+                    tooltip: {
+                        x: {
+                            format: 'yyyy/MM/dd HH:mm'
+                        },
+                    },
+                };
+                var chartEurope = new ApexCharts(document.querySelector("#chart-" + index), options);
+                chartEurope.render();
+
+            })
+        });
+
+
+    </script>
+
+    <script>
+        let optionsPerTagMonth = {
+            {#series: [70, 30],#}
+            series: {{ account_tags_chart_values|safe }},
+            {#labels: ['Male', 'Female'],#}
+            labels: {{ account_tags_chart_titles|safe }},
+            {#colors: ['#435ebe', '#55c6e8'],#}
+            chart: {
+                type: 'donut',
+                width: '100%',
+                height: '350px'
+            },
+            legend: {
+                position: 'bottom'
+            },
+            plotOptions: {
+                pie: {
+                    donut: {
+                        size: '30%'
+                    }
+                }
+            }
+        };
+
+        var perTagMonth = new ApexCharts(document.getElementById('chart-visitors-profile'), optionsPerTagMonth);
+        perTagMonth.render();
+    </script>
+
+    <script src="{% static "vendors/simple-datatables/simple-datatables.js" %}"></script>
+    <script>
+        // Simple Datatable
+        let table1 = document.querySelector('#table1');
+        let dataTable = new simpleDatatables.DataTable(table1);
+
+        let table2 = document.querySelector('#table2');
+        let dataTable2 = new simpleDatatables.DataTable(table2);
+    </script>
+
+
+    <script>
+        $(document).ready(function () {
+            $(".accordion-button").click();
+        });
+    </script>
+
+    <!-- Include Choices JavaScript -->
+    <script src="{% static "vendors/choices.js/choices.min.js" %}"></script>
+    <script src="{% static "js/pages/form-element-select.js" %}"></script>
+{% endblock %}

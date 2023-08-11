@@ -1,0 +1,192 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Dashboard - PersonalFin</title>
+
+    <link rel="preconnect" href="https://fonts.gstatic.com"/>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;800&display=swap"
+          rel="stylesheet"/>
+
+    <link rel="stylesheet" href="{% static 'vendors/toastify/toastify.css' %}">
+
+    <link rel="stylesheet" href="{% static 'vendors/sweetalert2/sweetalert2.min.css' %}">
+
+    <link rel="stylesheet" href="{% static 'css/bootstrap.css' %}"/>
+    <link rel="stylesheet" href="{% static 'vendors/iconly/bold.css' %}"/>
+    <link rel="stylesheet" href="{% static 'vendors/perfect-scrollbar/perfect-scrollbar.css' %}"/>
+    <link rel="stylesheet" href="{% static 'vendors/bootstrap-icons/bootstrap-icons.css' %}"/>
+    <link rel="stylesheet" href="{% static 'css/app.css' %}"/>
+    {% block head %}
+    {% endblock %}
+</head>
+
+<body>
+<div id="app">
+    <div id="sidebar" class="active">
+        <div class="sidebar-wrapper active">
+            <div class="sidebar-header">
+                <div class="d-flex justify-content-between">
+                    <div class="logo">
+                        <a href="{% url 'homepage' %}"
+                        ><img src="{% static 'images/logo/coin.png' %}" alt="Logo" srcset=""
+                              style="width: 90px; height: 90px;"
+                        /></a>
+                    </div>
+                    <div class="toggler">
+                        <a href="#" class="sidebar-hide d-xl-none d-block"
+                        ><i class="bi bi-x bi-middle"></i
+                        ></a>
+                    </div>
+                </div>
+            </div>
+            <div class="sidebar-menu">
+                <ul class="menu">
+                    <li class="sidebar-title">Menu</li>
+                    <li class="sidebar-item {% if related_url == 'homepage' %}active{% endif %} has-sub">
+                        <a href="#" class="sidebar-link">
+                            <i class="fa fa-users"></i>
+                            <span>Accounts</span>
+                        </a>
+                        <ul class="submenu {% if related_url == 'homepage' %}active{% endif %}">
+                            {% for ua in user_accounts %}
+                                <div class="divider divider-left">
+                                    <div class="divider-text">
+                                        {% if ua.id == selected_account_id %}
+                                            <i class="fa fa-check"></i>&nbsp; <b>{{ ua.title }}</b>
+                                        {% else %}
+                                            {{ ua.title }}
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                <div class="users">
+                                    {% for u in ua.user_accounts.all %}
+                                        {% if u == user %}
+                                            <a href="#" data-bs-toggle="tooltip" title="" class="avatar bg-warning me-1"
+                                               data-bs-original-title="Yourself!">
+                                                <img src="{% static u.profile_avatar_url %}"
+                                                     alt="" srcset="">
+                                            </a>
+                                        {% else %}
+                                            <a href="#" data-bs-toggle="tooltip" title="" class="avatar bg-warning me-1"
+                                               data-bs-original-title="{{ u.username }}">
+                                                <img src="{% static u.profile_avatar_url %}"
+                                                     alt="" srcset="">
+                                            </a>
+                                        {% endif %}
+
+                                    {% endfor %}
+                                </div>
+                                <div class="buttons" style="margin-top: 20px;">
+                                    <a class="btn btn-sm btn-primary"
+                                       href="{% url 'homepage' %}?account_id={{ ua.id }}">
+                                        <i class="fa fa-info" aria-hidden="true"></i>
+                                        <span>Details</span>
+                                    </a>
+                                </div>
+                            {% endfor %}
+                        </ul>
+                    </li>
+
+                    <li class="sidebar-item {% if related_url == 'profile' %} active {% endif %}">
+                        <a href="{% url 'profile' %}"
+                           class="sidebar-link">
+                            <i class="fa fa-address-card"></i>
+                            <span>Profile</span>
+                        </a>
+                    </li>
+
+                    <li class="sidebar-item  ">
+                        <a href="{% url 'logout' %}" class="sidebar-link">
+                            <i class="fa fa-sign-out-alt" aria-hidden="true"></i>
+                            <span>Logout</span>
+                        </a>
+                    </li>
+
+
+                </ul>
+            </div>
+            <button class="sidebar-toggler btn x">
+                <i data-feather="x"></i>
+            </button>
+        </div>
+    </div>
+    <div id="main">
+        <header class="mb-3">
+            <a href="#" class="burger-btn d-block d-xl-none">
+                <i class="bi bi-justify fs-3"></i>
+            </a>
+        </header>
+
+        <div class="page-heading">
+            {% block page_heading %}
+            {% endblock %}
+        </div>
+        <div class="page-content">
+            {% block content %}
+            {% endblock %}
+        </div>
+
+        <footer>
+            <div class="footer clearfix mb-0 text-muted">
+                <div class="float-start">
+                    <p>2021 &copy; PersonalFin</p>
+                </div>
+                <div class="float-end">
+                    <p>
+                        Created with
+                        <span class="text-danger"><i class="bi bi-heart"></i></span> by
+                        <a href="/">Reza Mohammadi Moqaddam</a>
+                    </p>
+                </div>
+            </div>
+        </footer>
+    </div>
+</div>
+<script src="{% static 'vendors/perfect-scrollbar/perfect-scrollbar.min.js' %}"></script>
+<script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
+<script src="{% static 'vendors/toastify/toastify.js' %}"></script>
+<script src="{% static 'vendors/apexcharts/apexcharts.js' %}"></script>
+<script src="{% static 'vendors/fontawesome/all.min.js' %}"></script>
+<script src="{% static "vendors/jquery/jquery.min.js" %}"></script>
+<script>
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl)
+    })
+</script>
+{% block tail %}
+{% endblock %}
+
+{#<script src="{% static 'js/extensions/sweetalert2.js' %}"></script>#}
+<script src="{% static 'vendors/sweetalert2/sweetalert2.all.min.js' %}"></script>
+
+<script src="{% static 'js/main.js' %}"></script>
+<script>
+    $(document).ready(function () {
+        {% if messages %}
+            {% for message in messages %}
+                {% if message.tags == 'info' %}
+                    Toastify({
+                        text: "{{ message|safe }}",
+                        duration: 10000,
+                        close: true,
+                        gravity: "top",
+                        position: "center",
+                        backgroundColor: "blue",
+                    }).showToast();
+                {% elif message.tags == 'error' %}
+                    Swal.fire({
+                        icon: "error",
+                        title: "{{ message|safe }}"
+                    });
+                {% endif %}
+
+            {% endfor %}
+        {% endif %}
+    });
+</script>
+</body>
+</html>

@@ -1,0 +1,661 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load humanize %}
+
+{% block head %}
+    <link rel="stylesheet" href="{% static "vendors/fontawesome/all.min.css" %}">
+    <style>
+        .fontawesome-icons {
+            text-align: center;
+        }
+
+        article dl {
+            background-color: rgba(0, 0, 0, .02);
+            padding: 20px;
+        }
+
+        .fontawesome-icons .the-icon svg {
+            font-size: 24px;
+        }
+    </style>
+
+    <link rel="stylesheet" href="{% static "vendors/fontawesome/css/font-awesome.css" %}">
+    <link rel="stylesheet" href="{% static "vendors/simple-datatables/style.css" %}">
+
+    <!-- Include Choices CSS -->
+    <link rel="stylesheet" href="{% static "vendors/choices.js/choices.min.css" %}"/>
+    <style>
+        .choices {
+            width: 100% !important;
+        }
+    </style>
+{% endblock %}
+
+{% block page_heading %}
+    <h3>Profile Details</h3>
+{% endblock %}
+
+{% block content %}
+    <section class="row">
+        <div class="col-12 col-lg-6">
+            <div class="card">
+                <div class="card-header">
+                    <h4>Profile details </h4>
+                </div>
+                <div class="card-content">
+                    <div class="card-body">
+                        <form class="form form-vertical" action="{% url 'update_personal_details' %}" method="post">
+                            {% csrf_token %}
+                            <div class="form-body">
+                                <div class="row">
+                                    <div class="col-12">
+                                        <div class="form-group has-icon-left">
+                                            <label for="first-name-icon">Username</label>
+                                            <div class="position-relative">
+                                                <input type="text" class="form-control"
+                                                       placeholder="Username"
+                                                       id="first-name-icon"
+                                                       value="{{ request.user.username }}"
+                                                       name="username">
+                                                <div class="form-control-icon">
+                                                    <i class="bi bi-person"></i>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-12">
+                                        <div class="form-group has-icon-left">
+                                            <label for="email-id-icon">Email</label>
+                                            <div class="position-relative">
+                                                <input type="text" class="form-control" placeholder="Email"
+                                                       id="email-id-icon"
+                                                       value="{{ request.user.email }}"
+                                                       name="email">
+                                                <div class="form-control-icon">
+                                                    <i class="bi bi-envelope"></i>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-12">
+                                        <div class="form-group has-icon-left">
+                                            <label for="mobile-id-icon">Mobile</label>
+                                            <div class="position-relative">
+                                                <input type="text" class="form-control" placeholder="Mobile"
+                                                       id="mobile-id-icon"
+                                                       value="{{ request.user.mobile_number }}"
+                                                       name="mobile_number">
+                                                <div class="form-control-icon">
+                                                    <i class="bi bi-phone"></i>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-12">
+                                        <div class="form-group">
+                                            <label for="mobile-id-icon">Avatar</label>
+                                            <div class="position-relative" style="padding: 0.1em">
+                                                <input type="hidden" id="user_avatar" name="profile_avatar_url"
+                                                       value="{% static request.user.profile_avatar_url %}">
+                                                <img id="user_avatar_img"
+                                                     src="{% static request.user.profile_avatar_url %}"
+                                                     alt="" srcset=""
+                                                     style="width: 25px; height: 25px; margin-left: 0.4em;">
+                                                <div class="btn-group mb-1" style="margin-left: 15px;">
+                                                    <div class="dropdown">
+                                                        <button class="btn btn-sm btn-outline-info dropdown-toggle me-1"
+                                                                type="button"
+                                                                id="dropdownMenuButton" data-bs-toggle="dropdown"
+                                                                aria-haspopup="true"
+                                                                aria-expanded="false">
+                                                            Select
+                                                        </button>
+                                                        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                                            <div class="row">
+                                                                <div class="col-3" style="padding: 0;">
+                                                                    <a class="dropdown-item"
+                                                                       onclick="update_avatar(this);return false;">
+                                                                        <img src="{% static 'images/avatars/avatar10.png' %}"
+                                                                             alt="" srcset=""
+                                                                             style="width: 30px; height: 30px;">
+                                                                    </a>
+                                                                </div>
+                                                                <div class="col-3" style="padding: 0;">
+                                                                    <a class="dropdown-item"
+                                                                       onclick="update_avatar(this);return false;">
+                                                                        <img src="{% static 'images/avatars/avatar1.png' %}"
+                                                                             alt="" srcset=""
+                                                                             style="width: 30px; height: 30px;">
+                                                                    </a>
+                                                                </div>
+                                                                <div class="col-3" style="padding: 0;">
+                                                                    <a class="dropdown-item"
+                                                                       onclick="update_avatar(this);return false;">
+                                                                        <img src="{% static 'images/avatars/avatar2.png' %}"
+                                                                             alt="" srcset=""
+                                                                             style="width: 30px; height: 30px;">
+                                                                    </a>
+                                                                </div>
+                                                                <div class="col-3" style="padding: 0;">
+                                                                    <a class="dropdown-item"
+                                                                       onclick="update_avatar(this);return false;">
+                                                                        <img src="{% static 'images/avatars/avatar3.png' %}"
+                                                                             alt="" srcset=""
+                                                                             style="width: 30px; height: 30px;">
+                                                                    </a>
+                                                                </div>
+                                                                <div class="col-3" style="padding: 0;">
+                                                                    <a class="dropdown-item"
+                                                                       onclick="update_avatar(this);return false;">
+                                                                        <img src="{% static 'images/avatars/avatar4.png' %}"
+                                                                             alt="" srcset=""
+                                                                             style="width: 30px; height: 30px;">
+                                                                    </a>
+                                                                </div>
+                                                                <div class="col-3" style="padding: 0;">
+                                                                    <a class="dropdown-item"
+                                                                       onclick="update_avatar(this);return false;">
+                                                                        <img src="{% static 'images/avatars/avatar6.png' %}"
+                                                                             alt="" srcset=""
+                                                                             style="width: 30px; height: 30px;">
+                                                                    </a>
+                                                                </div>
+                                                                <div class="col-3" style="padding: 0;">
+                                                                    <a class="dropdown-item"
+                                                                       onclick="update_avatar(this);return false;">
+                                                                        <img src="{% static 'images/avatars/avatar8.png' %}"
+                                                                             alt="" srcset=""
+                                                                             style="width: 30px; height: 30px;">
+                                                                    </a>
+                                                                </div>
+                                                                <div class="col-3" style="padding: 0;">
+                                                                    <a class="dropdown-item"
+                                                                       onclick="update_avatar(this);return false;">
+                                                                        <img src="{% static 'images/avatars/avatar9.png' %}"
+                                                                             alt="" srcset=""
+                                                                             style="width: 30px; height: 30px;">
+                                                                    </a>
+                                                                </div>
+                                                                <div class="col-3" style="padding: 0;">
+                                                                    <a class="dropdown-item"
+                                                                       onclick="update_avatar(this);return false;">
+                                                                        <img src="{% static 'images/avatars/avatar13.png' %}"
+                                                                             alt="" srcset=""
+                                                                             style="width: 30px; height: 30px;">
+                                                                    </a>
+                                                                </div>
+                                                                <div class="col-3" style="padding: 0;">
+                                                                    <a class="dropdown-item"
+                                                                       onclick="update_avatar(this);return false;">
+                                                                        <img src="{% static 'images/avatars/avatar15.png' %}"
+                                                                             alt="" srcset=""
+                                                                             style="width: 30px; height: 30px;">
+                                                                    </a>
+                                                                </div>
+                                                                <div class="col-3" style="padding: 0;">
+                                                                    <a class="dropdown-item"
+                                                                       onclick="update_avatar(this);return false;">
+                                                                        <img src="{% static 'images/avatars/avatar17.png' %}"
+                                                                             alt="" srcset=""
+                                                                             style="width: 30px; height: 30px;">
+                                                                    </a>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-12 d-flex justify-content-end">
+                                        <button type="submit" class="btn btn-primary me-1 mb-1">save</button>
+
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-12 col-lg-6">
+        </div>
+
+        <div class="col-12 col-lg-6">
+            <div class="card">
+                <div class="card-header">
+                    <h4>Accounts details </h4>
+                </div>
+                <div class="card-content">
+                    <div class="card-body">
+                        <ul class="nav nav-tabs" id="myTab" role="tablist">
+                            {% for account in accounts %}
+                                <li class="nav-item" role="presentation">
+                                    <a class="nav-link {% if forloop.counter0 == 0 %}active{% endif %}"
+                                       id="{{ account.title }}-tab" data-bs-toggle="tab" href="#{{ account.title }}"
+                                       role="tab" aria-controls="{{ account.title }}"
+                                       aria-selected="true">
+                                        {% if account.owner == request.user %}
+                                            <i class="fa fa-briefcase" aria-hidden="true"></i>{% else %}
+                                            <i class="fa fa-user" aria-hidden="true"></i>{% endif %}
+                                        &nbsp;{{ account.title }}
+                                    </a>
+                                </li>
+                            {% endfor %}
+                            <li class="nav-item" role="presentation">
+                                <button type="button"
+                                        style="margin: 10px; height: 20px;width: 20px; padding: 0;"
+                                        class="btn btn-sm btn-primary"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#add-account">
+                                    <i class="fa fa-plus"></i>
+                                </button>
+                                <!--Add New Account Modal -->
+                                <div class="modal fade text-left" id="add-account" tabindex="-1"
+                                     role="dialog"
+                                     aria-labelledby="myModalLabel110" aria-hidden="true">
+                                    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable"
+                                         role="document">
+                                        <div class="modal-content">
+                                            <div class="modal-header bg-primary">
+                                                <h5 class="modal-title white" id="myModalLabel110">
+                                                    Add New Account
+                                                </h5>
+                                                <button type="button" class="close"
+                                                        data-bs-dismiss="modal"
+                                                        aria-label="Close">
+                                                    <i data-feather="x"></i>
+                                                </button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <form class="form form-horizontal" id="add-account-form"
+                                                      action="{% url 'create_account' %}" method="post">
+                                                    {% csrf_token %}
+                                                    <div class="form-body">
+                                                        <div class="row">
+                                                            <div class="col-12">
+                                                                <div class="form-group has-icon-left">
+                                                                    <div class="position-relative">
+                                                                        <input type="text" class="form-control"
+                                                                               placeholder="Title"
+                                                                               id="first-name-icon" name="title">
+                                                                        <div class="form-control-icon">
+                                                                            <i class="bi bi-pencil"></i>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+
+                                                        </div>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-light-secondary"
+                                                        data-bs-dismiss="modal">
+                                                    Close
+                                                </button>
+                                                <button type="button" class="btn btn-primary ml-1"
+                                                        data-bs-dismiss="modal"
+                                                        onclick="$('#add-account-form').submit()">
+                                                    Add
+                                                </button>
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </li>
+                        </ul>
+                        <div class="tab-content" id="myTabContent">
+                            <!--Edit tag Modal -->
+                            <div class="modal fade text-left" id="edit-tag" tabindex="-1"
+                                 role="dialog"
+                                 aria-labelledby="myModalLabel110" aria-hidden="true">
+                                <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable"
+                                     role="document">
+                                    <div class="modal-content">
+                                        <div class="modal-header bg-secondary">
+                                            <h5 class="modal-title white" id="myModalLabel110">
+                                                Edit Tag
+                                            </h5>
+                                            <button type="button" class="close"
+                                                    data-bs-dismiss="modal"
+                                                    aria-label="Close">
+                                                <i data-feather="x"></i>
+                                            </button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <form class="form form-horizontal" id="edit-tag-form"
+                                                  action="{% url 'edit_tag' %}" method="post">
+                                                {% csrf_token %}
+                                                <input type="hidden" value="" id="tag-id" name="tag_id">
+                                                <input type="hidden" name="next" value="{% url 'profile' %}">
+                                                <div class="form-body">
+                                                    <div class="row">
+                                                        <div class="col-12">
+                                                            <div class="form-group has-icon-left">
+                                                                <div class="position-relative">
+                                                                    <input type="text" class="form-control"
+                                                                           placeholder="Title"
+                                                                           id="tag-title" name="title">
+                                                                    <div class="form-control-icon">
+                                                                        <i class="bi bi-tag"></i>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                    </div>
+                                                </div>
+                                            </form>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-light-danger"
+                                                    data-bs-dismiss="modal">
+                                                Close
+                                            </button>
+                                            <button type="button" class="btn btn-secondary ml-1"
+                                                    data-bs-dismiss="modal"
+                                                    onclick="$('#edit-tag-form').submit()">
+                                                Edit
+                                            </button>
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            {% for account in accounts %}
+                                <div class="tab-pane fade {% if forloop.counter0 == 0 %}active show{% endif %}"
+                                     id="{{ account.title }}" role="tabpanel" aria-labelledby="{{ account.title }}-tab">
+                                    <hr style="margin-top: 30px;">
+                                    <h5 style="font-size: 12pt;">Details</h5>
+                                    <div class="row" style="margin-bottom: 30px; margin-top: 30px;">
+                                        <div class="col-12">
+                                            <a href="{% url 'change_account' %}?account_id={{ account.id }}&next=/"
+                                               target="_blank" class="btn btn-success btn-sm">
+                                                <i class="fa fa-link"></i> Open
+                                            </a>
+                                            {% if account.id != request.user.default_account_id %}
+                                                <a href="{% url 'set_default_account' %}?account_id={{ account.id }}"
+                                                   class="btn btn-primary btn-sm">
+                                                    <i class="fa fa-trash"></i> Set as default
+                                                </a>
+                                                <a href="{% url 'delete_account' %}?account_id={{ account.id }}"
+                                                   class="btn btn-danger btn-sm">
+                                                    <i class="fa fa-trash"></i> Delete
+                                                </a>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+
+                                    <form action="{% url 'update_account' %}" method="post">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="id" value="{{ account.id }}">
+                                        <div class="form-group position-relative">
+                                            <div class="input-group mb-3">
+                                                        <span class="input-group-text" id="basic-addon1"><i
+                                                                class="bi bi-pen"></i></span>
+                                                <input type="text" class="form-control"
+                                                       placeholder="Account Title"
+                                                       aria-label="Account Title"
+                                                       aria-describedby="button-addon2" name="title"
+                                                       value="{{ account.title }}">
+                                                <button class="btn btn-outline-primary" type="submit"
+                                                        id="button-addon2">
+                                                    Update
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </form>
+                                    <hr style="margin-top: 30px;">
+                                    <h5 style="font-size: 12pt;">Users</h5>
+                                    {% if account.owner == request.user %}
+                                        <form action="{% url 'invite_user' %}" method="post">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="id" value="{{ account.id }}">
+                                            <div class="form-group position-relative">
+                                                <div class="input-group mb-3">
+                                                        <span class="input-group-text" id="basic-addon1"><i
+                                                                class="bi bi-search"></i></span>
+                                                    <input type="text" class="form-control"
+                                                           placeholder="Username"
+                                                           aria-label="Account Title"
+                                                           aria-describedby="button-addon2" name="username"
+                                                           value="">
+                                                    <button class="btn btn-outline-primary" type="submit"
+                                                            id="button-addon2">
+                                                        Invite
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </form>
+                                    {% endif %}
+
+                                    <div class="table-responsive">
+
+                                        <table class="table table-hover table-sm">
+                                            <thead>
+                                            <tr>
+                                                <th>Name</th>
+                                                <th>Actions</th>
+                                            </tr>
+                                            </thead>
+                                            <tbody>
+                                            {% for user in account.user_accounts.all %}
+                                                <tr>
+                                                    <td class="col-3">
+                                                        <div class="d-flex align-items-center">
+                                                            <div class="avatar avatar-md">
+                                                                <img src="{% static user.profile_avatar_url %}">
+                                                            </div>
+                                                            <p class="font-bold ms-3 mb-0">{{ user.username }}</p>
+                                                        </div>
+                                                    </td>
+                                                    <td class="col-auto">
+                                                        {% if request.user != user and account.owner == request.user %}
+                                                            <a class="btn btn-sm btn-warning">
+                                                                <i class="fa fa-briefcase"></i> Make Owner
+                                                            </a>
+                                                        {% endif %}
+                                                        {% if request.user != user and account.owner == request.user %}
+                                                            <a class="btn btn-sm btn-danger">
+                                                                <i class="fa fa-trash"></i> Deactivate
+                                                            </a>
+                                                        {% endif %}
+                                                    </td>
+                                                </tr>
+                                            {% endfor %}
+                                            </tbody>
+                                        </table>
+                                    </div>
+
+                                    <hr style="margin-top: 30px;">
+                                    <h5 style="font-size: 12pt;">Tags</h5>
+                                    <form action="{% url 'add_tag' %}" method="post">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="account_id" value="{{ account.id }}">
+                                        <input type="hidden" name="next" value="{% url 'profile' %}">
+                                        <div class="form-group position-relative">
+                                            <div class="input-group mb-3">
+                                                        <span class="input-group-text" id="basic-addon1"><i
+                                                                class="bi bi-tag"></i></span>
+                                                <input type="text" class="form-control"
+                                                       placeholder="Title"
+                                                       aria-label="Account Title"
+                                                       aria-describedby="button-addon2" name="title"
+                                                       value="">
+                                                <button class="btn btn-outline-success" type="submit"
+                                                        id="button-addon2">
+                                                    Add
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </form>
+
+                                    <div class="table-responsive">
+
+                                        <table class="table table-hover table-sm">
+                                            <thead>
+                                            <tr>
+                                                <th>Title</th>
+                                                <th>Actions</th>
+                                            </tr>
+                                            </thead>
+                                            <tbody>
+                                            {% for tag in account.tag_set.all %}
+                                                <tr>
+                                                    <td class="col-3">
+                                                        <div class="d-flex align-items-center">
+                                                            <p class="font-bold ms-3 mb-0">{{ tag.title }}</p>
+                                                        </div>
+                                                    </td>
+                                                    <td class="col-auto">
+                                                        <button type="button"
+                                                                class="btn btn-sm btn-secondary"
+                                                                data-bs-toggle="modal"
+                                                                data-bs-target="#edit-tag"
+                                                                onclick="$('#tag-title').val('{{ tag.title }}'); $('#tag-id').val({{ tag.id }})">
+                                                            <i class="fa fa-pen"></i> Edit
+                                                        </button>
+                                                        <a class="btn btn-sm btn-danger"
+                                                           href="{% url 'remove_tag' %}?tag_id={{ tag.id }}&next={% url 'profile' %}">
+                                                            <i class="fa fa-trash"></i> Delete
+                                                        </a>
+
+                                                    </td>
+                                                </tr>
+                                            {% endfor %}
+                                            </tbody>
+                                        </table>
+                                    </div>
+
+                                </div>
+                            {% endfor %}
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 col-lg-6">
+            <div class="card">
+                <div class="card-header">
+                    <h4>Invitations</h4>
+                </div>
+                <div class="card-content">
+                    <div class="card-body">
+
+                        <div class="table-responsive">
+                            <table class="table table-hover table-sm">
+                                <thead>
+                                <tr>
+                                    <th>Account Title</th>
+                                    <th>Owner</th>
+                                    <th>Actions</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {% for invitation in invitations %}
+                                    <tr>
+                                        <td class="col-3">
+                                            <p style="margin-bottom: 0;">{{ invitation.account.title }}</p>
+                                        </td>
+                                        <td class="col-3">
+                                            <div class="d-flex align-items-center">
+                                                <div class="avatar avatar-md">
+                                                    <img src="{% static invitation.account.owner.profile_avatar_url %}">
+                                                </div>
+                                                <p class="font-bold ms-3 mb-0">{{ invitation.account.owner.username }}</p>
+                                            </div>
+                                        </td>
+                                        <td class="col-auto">
+                                            <a class="btn btn-sm btn-success"
+                                               href="{% url 'accept_invitation' %}?invitation_id={{ invitation.id }}">
+                                                <i class="fa fa-check"></i> Accept
+                                            </a>
+                                            <a class="btn btn-sm btn-danger"
+                                               href="{% url 'decline_invitation' %}?invitation_id={{ invitation.id }}">
+                                                <i class="fa fa-check"></i> Decline
+                                            </a>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 col-lg-6">
+            <div class="card">
+                <div class="card-header">
+                    <h4>Change Password</h4>
+                </div>
+                <div class="card-content">
+                    <div class="card-body">
+                        <form class="form form-vertical" action="{% url 'change_password' %}" method="post">
+                            {% csrf_token %}
+                            <div class="form-body">
+                                <div class="row">
+                                    <div class="col-12">
+                                        <div class="form-group has-icon-left">
+                                            <label for="email-id-icon">New Password</label>
+                                            <div class="position-relative">
+                                                <input type="password" class="form-control" placeholder="New Password"
+                                                       id="email-id-icon" name="password">
+                                                <div class="form-control-icon">
+                                                    <i class="bi bi-key"></i>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-12">
+                                        <div class="form-group has-icon-left">
+                                            <label for="mobile-id-icon">Confirm New Password</label>
+                                            <div class="position-relative">
+                                                <input type="password" class="form-control"
+                                                       placeholder="Confirm New Password"
+                                                       id="mobile-id-icon" name="confirm_password">
+                                                <div class="form-control-icon">
+                                                    <i class="bi bi-key"></i>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-12 d-flex justify-content-end">
+                                        <button type="submit" class="btn btn-primary me-1 mb-1">Update</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+    </section>
+{% endblock %}
+
+{% block tail %}
+    <script>
+        function update_avatar(elem) {
+            // get selected url
+            let image_path = $(elem).find('img').attr("src");
+            $("#user_avatar").val(image_path);
+            $("#user_avatar_img").attr("src", image_path);
+        }
+    </script>
+{% endblock %}
+
+

@@ -1,0 +1,192 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load humanize %}
+
+
+{% block head %}
+    <link rel="stylesheet" href="{% static "vendors/fontawesome/all.min.css" %}">
+    <style>
+        .fontawesome-icons {
+            text-align: center;
+        }
+
+        article dl {
+            background-color: rgba(0, 0, 0, .02);
+            padding: 20px;
+        }
+
+        .fontawesome-icons .the-icon svg {
+            font-size: 24px;
+        }
+    </style>
+
+    <link rel="stylesheet" href="{% static "vendors/fontawesome/css/font-awesome.css" %}">
+    <link rel="stylesheet" href="{% static "vendors/simple-datatables/style.css" %}">
+
+    <!-- Include Choices CSS -->
+    <link rel="stylesheet" href="{% static "vendors/choices.js/choices.min.css" %}"/>
+    <style>
+        .choices {
+            width: 100% !important;
+        }
+    </style>
+{% endblock %}
+
+{% block page_heading %}
+    <h3>Profile Statistics</h3>
+{% endblock %}
+
+{% block content %}
+    <input type="hidden" value="{{ tags }}">
+    <input type="hidden" id="last_ten_users_transactions" value="{{ last_ten_users_transactions }}">
+    <section class="row">
+        <div class="col-12 col-lg-6">
+            <div class="card">
+                <div class="card-header">
+                    <h4>Edit Transaction </h4>
+                </div>
+                <div class="card-content">
+                    <div class="card-body">
+                        <form class="form form-horizontal" id="edit-transaction-form"
+                              action="{% url 'edit_transaction' %}" method="post">
+                            {% csrf_token %}
+                            <input type="hidden" id="transaction_id" name="transaction_id" value="{{ transaction_id }}">
+                            <div class="form-body">
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <label>Title</label>
+                                    </div>
+                                    <div class="col-md-8">
+                                        <div class="form-group has-icon-left">
+                                            <div class="position-relative">
+                                                <input type="text" class="form-control" placeholder="Title"
+                                                       id="edit-title" name="title" value="{{ title }}">
+                                                <div class="form-control-icon">
+                                                    <i class="bi bi-pen"></i>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <label>Value</label>
+                                    </div>
+                                    <div class="col-md-8">
+                                        <div class="form-group has-icon-left">
+                                            <div class="position-relative">
+                                                <input type="text" class="form-control" placeholder="Value"
+                                                       id="edit-value" name="value_raw" value="{{ value_raw }}">
+                                                <div class="form-control-icon">
+                                                    <i class="bi bi-cash-stack"></i>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <label>Discount</label>
+                                    </div>
+                                    <div class="col-md-8">
+                                        <div class="form-group has-icon-left">
+                                            <div class="position-relative">
+                                                <input type="text" class="form-control"
+                                                       placeholder="Discount Value"
+                                                       id="edit-discount" name="discount" value="{{ discount }}">
+                                                <div class="form-control-icon">
+                                                    <i class="bi bi-cash"></i>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <label>Related Tags</label>
+                                    </div>
+                                    <div class="col-md-8">
+                                        <div id="edit-tags-wrapper" class="input-group mb-3">
+                                            <select class="choices form-select" multiple="multiple"
+                                                    id="edit-tags" name="tags">
+                                                {% for tag in tags %}
+                                                    <option value="{{ tag.id }}"
+                                                            {% if tag.id in selected_tags %}selected{% endif %}>
+                                                        {{ tag.title }}
+                                                    </option>
+                                                {% endfor %}
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <label>Date</label>
+                                    </div>
+                                    <div class="col-md-8">
+                                        <div class="form-group has-icon-left">
+                                            <div class="position-relative">
+                                                <input type="text" class="form-control" placeholder="Date"
+                                                       id="edit-date" name="date"
+                                                       value="{{ date|date:'Y-m-d H:i' }}">
+                                                <div class="form-control-icon">
+                                                    <i class="bi bi-calendar"></i>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <label>Description</label>
+                                    </div>
+                                    <div class="col-md-8">
+                                        <div class="form-group">
+                                            <div class="position-relative">
+                                                <textarea type="text" class="form-control" placeholder="Description"
+                                                          id="edit-description" name="description"
+                                                          rows="4">{{ description }}</textarea>
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-12" style="float: right; text-align: right;">
+                                        <a class="btn btn-light-secondary" href="{% url 'homepage' %}">
+                                            Back
+                                        </a>
+                                        <button type="button" class="btn btn-secondary ml-1"
+                                                onclick="$('#edit-transaction-form').submit()">
+                                            Update
+                                        </button>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+
+{% endblock %}
+
+{% block tail %}
+
+
+
+
+
+
+
+    <!-- Include Choices JavaScript -->
+    <script src="{% static "vendors/choices.js/choices.min.js" %}"></script>
+    <script src="{% static "js/pages/form-element-select.js" %}"></script>
+{% endblock %}
